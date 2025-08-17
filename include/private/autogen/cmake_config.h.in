@@ -134,6 +134,141 @@
 /* Define to 1 if you have the `windows.h' header. */
 #cmakedefine01 HWLOC_HAVE_WINDOWS_H
 
+/* Whether C compiler supports symbol visibility or not */
+#cmakedefine01 HWLOC_C_HAVE_VISIBILITY
+
+/* Define to 1 if gcc -Wmissing-field-initializers is supported and enabled */
+#cmakedefine HWLOC_HAVE_GCC_W_MISSING_FIELD_INITIALIZERS
+
+/* Define to 1 if gcc -Wcast-function-type is supported and enabled */
+#cmakedefine HWLOC_HAVE_GCC_W_CAST_FUNCTION_TYPE
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H
+
+/* Define to 1 if you have the <dirent.h> header file. */
+#cmakedefine HAVE_DIRENT_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#cmakedefine HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#cmakedefine HAVE_STRING_H
+
+/* Define to 1 if you have the <ctype.h> header file. */
+#cmakedefine HAVE_CTYPE_H
+
+/* Define to 1 if you have the <sys/wait.h> header file. */
+#cmakedefine HAVE_SYS_WAIT_H
+
+/* Define to 1 if function `strcasecmp' is declared by system headers. */
+#cmakedefine HWLOC_HAVE_DECL_STRCASECMP
+
+/* Define to 1 if function `strncasecmp' is declared by system headers. */
+#cmakedefine HWLOC_HAVE_DECL_STRNCASECMP
+
+/* Define to 1 if you have the `strftime' function. */
+#cmakedefine HAVE_STRFTIME
+
+/* Define to 1 if you have the `setlocale' function. */
+#cmakedefine HAVE_SETLOCALE
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#cmakedefine HWLOC_HAVE_STDINT_H
+
+/* Define to 1 if you have the <sys/mman.h> header file. */
+#cmakedefine HAVE_SYS_MMAN_H
+
+/* Define to 1 if you have the <sys/domainset.h> header file. */
+#cmakedefine HAVE_SYS_DOMAINSET_H
+
+/* Define to 1 if you have the <sys/thr.h> header file. */
+#cmakedefine HAVE_SYS_THR_H
+
+/* Define to 1 if you have the <pthread_np.h> header file. */
+#cmakedefine HAVE_PTHREAD_NP_H
+
+/* Define to 1 if you have the <sys/cpuset.h> header file. */
+#cmakedefine HAVE_SYS_CPUSET_H
+
+/* Define to 1 if you have the `cpuset_setaffinity' function. */
+#cmakedefine HAVE_CPUSET_SETAFFINITY
+
+/* Define to 1 if you have the `cpuset_setid' function. */
+#cmakedefine HAVE_CPUSET_SETID
+
+/* Define to 1 if the system has the type `KAFFINITY'. */
+#cmakedefine HAVE_KAFFINITY
+
+/* Define to 1 if the system has the type `PROCESSOR_CACHE_TYPE'. */
+#cmakedefine HAVE_PROCESSOR_CACHE_TYPE
+
+/* Define to 1 if the system has the type `CACHE_DESCRIPTOR'. */
+#cmakedefine HAVE_CACHE_DESCRIPTOR
+
+/* Define to 1 if the system has the type `LOGICAL_PROCESSOR_RELATIONSHIP'. */
+#cmakedefine HAVE_LOGICAL_PROCESSOR_RELATIONSHIP
+
+/* Define to 1 if the system has the type `RelationProcessorPackage'. */
+#cmakedefine HAVE_RELATIONPROCESSORPACKAGE
+
+/* Define to 1 if the system has the type `CACHE_RELATIONSHIP'. */
+#cmakedefine HAVE_CACHE_RELATIONSHIP
+
+/* Define to 1 if the system has the type `PROCESSOR_GROUP_INFO'. */
+#cmakedefine HAVE_PROCESSOR_GROUP_INFO
+
+/* Define to 1 if the system has the type `PROCESSOR_NUMBER'. */
+#cmakedefine HAVE_PROCESSOR_NUMBER
+
+/* Define to 1 if the system has the type `PROCESSOR_RELATIONSHIP'. */
+#cmakedefine HAVE_PROCESSOR_RELATIONSHIP
+
+/* Define to 1 if the system has the type `RelationProcessorDie'. */
+#cmakedefine HAVE_RELATIONPROCESSORDIE
+
+/* Define to 1 if the system has the type `GROUP_AFFINITY'. */
+#cmakedefine HAVE_GROUP_AFFINITY
+
+/* Define to 1 if the system has the type `PROCESSOR_RELATIONSHIP'. */
+#cmakedefine HAVE_PROCESSOR_RELATIONSHIP
+
+/* Define to 1 if the system has the type `NUMA_NODE_RELATIONSHIP'. */
+#cmakedefine HAVE_NUMA_NODE_RELATIONSHIP
+
+/* Define to 1 if the system has the type `CACHE_RELATIONSHIP'. */
+#cmakedefine HAVE_CACHE_RELATIONSHIP
+
+/* Define to 1 if the system has the type `PROCESSOR_GROUP_INFO'. */
+#cmakedefine HAVE_PROCESSOR_GROUP_INFO
+
+/* Define to 1 if the system has the type `GROUP_RELATIONSHIP'. */
+#cmakedefine HAVE_GROUP_RELATIONSHIP
+
+/* Define to 1 if the system has the type
+   `SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX'. */
+#cmakedefine HAVE_SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX
+
+/* Define to 1 if the system has the type `PSAPI_WORKING_SET_EX_BLOCK'. */
+#cmakedefine HAVE_PSAPI_WORKING_SET_EX_BLOCK
+
+/* Define to 1 if the system has the type `PSAPI_WORKING_SET_EX_INFORMATION'.
+   */
+#cmakedefine HAVE_PSAPI_WORKING_SET_EX_INFORMATION
+
+/* Define to 1 if the system has the type `PROCESSOR_NUMBER'. */
+#cmakedefine HAVE_PROCESSOR_NUMBER
+
+/* Define to 1 if you have the declaration of `GetModuleFileName', and to 0 if
+   you don't. */
+#cmakedefine HAVE_DECL_GETMODULEFILENAME
+
+/* Define to 1 if we have -lgdi32 */
+#cmakedefine HAVE_LIBGDI32
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#cmakedefine HAVE_DLFCN_H
+
 /* Are we building for HP-UX? */
 #cmakedefine01 _HPUX_SOURCE
 

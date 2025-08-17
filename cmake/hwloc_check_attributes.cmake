@@ -5,12 +5,12 @@ function(hwloc_check_specific_attribute ATTRIBUTE CHECK_CODE CROSS_CHECK_CODE AD
     )
 
     if (HWLOC_HAVE_ATTRIBUTE_${ATTRIBUTE} AND CROSS_CHECK_CODE)
+        set(CMAKE_REQUIRED_FLAGS  ${ADDITIONAL_FLAGS})
         check_c_source_compiles("${CROSS_CHECK}
                    int i=4711;
                    i=usage(&i);
         "
                 HWLOC_HAVE_ATTRIBUTE_${ATTRIBUTE}
-                CMAKE_REQUIRED_FLAGS ${ADDITIONAL_FLAGS}
                 FAIL_REGEX "ignore|skip"
         )
     endif ()
@@ -23,6 +23,7 @@ function(hwloc_check_attributes)
     include(CheckCSourceCompiles)
 
     set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+    set(CMAKE_REQUIRED_QUIET TRUE)
 
     check_c_source_compiles("
     #include <stdlib.h>
@@ -294,7 +295,7 @@ function(hwloc_check_attributes)
                 "
                  int foo(int arg);
                  int foo(int arg) { return arg + 3; }
-                 int foo2(int arg) __attribute__ ((__weak__, __alias__("foo")));
+                 int foo2(int arg) __attribute__ ((__weak__, __alias__(\"foo\")));
                 "
                 FALSE
                 FALSE

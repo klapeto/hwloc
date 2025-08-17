@@ -5,6 +5,8 @@ find_program(SH_PROGRAM NAMES bash sh)
 include(cmake/hwloc_internal.cmake)
 include(cmake/hwloc.cmake)
 include(cmake/hwloc_check_attributes.cmake)
+include(cmake/hwloc_check_vendor.cmake)
+include(cmake/hwloc_check_visibility.cmake)
 
 enable_testing()
 
@@ -32,3 +34,7 @@ project(hwloc
         LANGUAGES C
         VERSION ${HWLOC_VERSION_MAJOR}.${HWLOC_VERSION_MINOR}.${HWLOC_VERSION_RELEASE}
 )
+
+#add_executable(testPr test_visibility.c)
+#target_link_options(testPr PRIVATE -fvisibility=hidden -Werror)
+#target_compile_options(testPr PRIVATE -fvisibility=hidden -Werror)
