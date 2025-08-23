@@ -266,6 +266,117 @@
 /* Define to 1 if we have -lgdi32 */
 #cmakedefine HAVE_LIBGDI32
 
+/* Define to 1 if you have the <sys/lgrp_user.h> header file. */
+#cmakedefine HAVE_SYS_LGRP_USER_H
+
+/* Define to 1 if we have -llgrp */
+#cmakedefine HAVE_LIBLGRP
+
+/* Define to 1 if you have the <kstat.h> header file. */
+#cmakedefine HAVE_KSTAT_H
+
+/* Define to 1 if you have the <picl.h> header file. */
+#cmakedefine HAVE_PICL_H
+
+/* `Define to 1 if you have pthread_getthrds_np' */
+#cmakedefine HWLOC_HAVE_PTHREAD_GETTHRDS_NP
+
+/* `Define to 1 if you have the Foundation Darwin framework' */
+#cmakedefine HWLOC_HAVE_DARWIN_FOUNDATION
+
+/* `Define to 1 if you have the IOKit Darwin framework' */
+#cmakedefine HWLOC_HAVE_DARWIN_IOKIT
+
+/* Define to 1 if you have the declaration of `sched_getcpu', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_SCHED_GETCPU
+
+/* Define to 1 if glibc provides a prototype of sched_setaffinity() */
+#cmakedefine HWLOC_HAVE_SCHED_SETAFFINITY
+
+/* Define to 1 if glibc provides the old prototype (without length) of
+   sched_setaffinity() */
+#cmakedefine HWLOC_HAVE_OLD_SCHED_SETAFFINITY
+
+/* Define to 1 if the CPU_SET macro works */
+#cmakedefine HWLOC_HAVE_CPU_SET
+
+/* Define to 1 if the CPU_SET_S macro works */
+#cmakedefine HWLOC_HAVE_CPU_SET_S
+
+/* Define to 1 if function `syscall' is available with 6 parameters */
+#cmakedefine HWLOC_HAVE_SYSCALL
+
+/* Define to 1 if you have the <libudev.h> header file. */
+#cmakedefine HAVE_LIBUDEV_H
+
+/* Define to 1 if you have libudev. */
+#cmakedefine HWLOC_HAVE_LIBUDEV
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#cmakedefine HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/sysctl.h> header file. */
+#cmakedefine HAVE_SYS_SYSCTL_H
+
+/* Define to 1 if you have the declaration of `CTL_HW', and to 0 if you don't.
+   */
+#cmakedefine HAVE_DECL_CTL_HW
+
+/* Define to 1 if you have the declaration of `HW_NCPU', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_NCPU
+
+/* Define to 1 if you have the declaration of `HW_REALMEM64', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_REALMEM64
+
+/* Define to 1 if you have the declaration of `HW_MEMSIZE64', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_MEMSIZE64
+
+/* Define to 1 if you have the declaration of `HW_PHYSMEM64', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_PHYSMEM64
+
+/* Define to 1 if you have the declaration of `HW_USERMEM64', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_USERMEM64
+
+/* Define to 1 if you have the declaration of `HW_REALMEM', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_REALMEM
+
+/* Define to 1 if you have the declaration of `HW_MEMSIZE', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_MEMSIZE
+
+/* Define to 1 if you have the declaration of `HW_PHYSMEM', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_PHYSMEM
+
+/* Define to 1 if you have the declaration of `HW_USERMEM', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_HW_USERMEM
+
+/* Define to '1' if sysctl is present and usable */
+#cmakedefine HAVE_SYSCTL
+
+/* Define to '1' if sysctlbyname is present and usable */
+#cmakedefine HAVE_SYSCTLBYNAME
+
+/* Define to 1 if you have the declaration of `pthread_setaffinity_np', and to
+   0 if you don't. */
+#cmakedefine HAVE_DECL_PTHREAD_SETAFFINITY_NP
+
+/* Define to 1 if you have the declaration of `pthread_getaffinity_np', and to
+   0 if you don't. */
+#cmakedefine HAVE_DECL_PTHREAD_GETAFFINITY_NP
+
+/* Define to 1 if you have the declaration of `fabsf', and to 0 if you don't.
+   */
+#cmakedefine HAVE_DECL_FABSF
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #cmakedefine HAVE_DLFCN_H
 

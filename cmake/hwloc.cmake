@@ -31,6 +31,7 @@ endfunction()
 function(hwloc_setup_core prefix mode)
     include(CheckFunctionExists)
     include(CheckTypeSize)
+    include(CheckSymbolExists)
 
     # Print configuration message if provided
     if(ARGV3)
@@ -501,6 +502,7 @@ function(hwloc_setup_core prefix mode)
 
         check_include_file("windows.h" HWLOC_HAVE_WINDOWS_H)
 
+        set(CMAKE_REQUIRED_FLAGS_BAK ${CMAKE_REQUIRED_FLAGS})
         set(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS} -D_WIN32_WINNT=0x0601")
 
         check_type_size(KAFFINITY KAFFINITY)
@@ -524,15 +526,353 @@ function(hwloc_setup_core prefix mode)
 
         find_library(HAVE_LIBGDI32 gdi32)
         if (HAVE_LIBGDI32)
-            set(HWLOC_LIBS "-lgdi32  ${HWLOC_LIBS}")
+            set(HWLOC_LIBS "-lgdi32 ${HWLOC_LIBS}")
         endif ()
 
+        # It should check PostQuitMessage
         find_library(HAVE_USER32 user32)
 
         find_program(HWLOC_MS_LIB lib)
 
+        set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_BAK})
+
         message("**** end of Windows-specific checks")
     endif ()
+
+    if (HWLOC_SOLARIS_SYS)
+        message("")
+        message("**** Solaris-specific checks")
+
+        check_include_file("sys/lgrp_user.h" HAVE_SYS_LGRP_USER_H)
+        if (HAVE_SYS_LGRP_USER_H)
+            # It should check lgrp_init
+            find_library(HAVE_LIBLGRP lgrp)
+            if (HAVE_LIBLGRP)
+                set(HWLOC_LIBS "-llgrp ${HWLOC_LIBS}")
+                add_definitions(-DHAVE_LIBLGRP=1)
+            endif ()
+        endif ()
+
+        check_include_file("kstat.h" HAVE_KSTAT_H)
+        if (HAVE_KSTAT_H)
+            find_library(HAVE_LIBKSTAT kstat)
+            if (HAVE_LIBKSTAT)
+                set(HWLOC_LIBS "-lkstat ${HWLOC_LIBS}")
+                add_definitions(-DHAVE_LIBKSTAT=1)
+            endif ()
+        endif ()
+
+        check_include_file("picl.h" HAVE_PICL_H)
+        if (HAVE_PICL_H)
+            find_library(HAVE_LIBPICL picl)
+            if (HAVE_LIBPICL)
+                set(HWLOC_LIBS "-lpicl ${HWLOC_LIBS}")
+            endif ()
+        endif ()
+
+        message("**** end of Solaris-specific checks")
+    endif ()
+
+    if (HWLOC_AIX_SYS)
+        message("")
+        message("**** AIX-specific checks")
+
+        find_library(HWLOC_HAVE_PTHREAD pthread)
+        if (HWLOC_HAVE_PTHREAD)
+            check_function_exists(pthread_getthrds_np HWLOC_HAVE_PTHREAD_GETTHRDS_NP)
+            if (HWLOC_HAVE_PTHREAD_GETTHRDS_NP)
+                add_definitions(-DHWLOC_HAVE_PTHREAD_GETTHRDS_NP=1)
+            endif()
+        endif()
+
+        message("**** end of AIX-specific checks")
+    endif ()
+
+    if (HWLOC_DARWIN_SYS)
+        message("")
+        message("**** Darwin-specific checks")
+
+        message(CHECK_START "Checking for the Foundation framework")
+
+        set(CMAKE_REQUIRED_FLAGS_BAK ${CMAKE_REQUIRED_FLAGS})
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS} -framework Foundation")
+
+        check_c_source_compiles(
+                "
+                #include <CoreFoundation/CoreFoundation.h>
+
+                int main(){
+                    return CFDictionaryGetTypeID();
+                }
+                "
+                HWLOC_HAVE_DARWIN_FOUNDATION
+        )
+
+        if (HWLOC_HAVE_DARWIN_FOUNDATION)
+            message(CHECK_PASS Yes)
+            set(HWLOC_DARWIN_LDFLAGS "${HWLOC_DARWIN_LDFLAGS} -framework Foundation")
+            add_definitions(-DHWLOC_HAVE_DARWIN_FOUNDATION=1)
+        else()
+            message(CHECK_PASS No)
+        endif ()
+        set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_BAK})
+
+        message(CHECK_START "Checking for the IOKit framework")
+
+        set(CMAKE_REQUIRED_FLAGS_BAK ${CMAKE_REQUIRED_FLAGS})
+        set(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS} -framework IOKit")
+
+        check_c_source_compiles(
+                "
+                #include <IOKit/IOKitLib.h>
+
+                int main(){
+                    io_registry_entry_t service = IORegistryGetRootEntry(kIOMasterPortDefault);
+                    return 0;
+                }
+                "
+                HWLOC_HAVE_DARWIN_IOKIT
+        )
+
+        if (HWLOC_HAVE_DARWIN_IOKIT)
+            message(CHECK_PASS Yes)
+            set(HWLOC_DARWIN_LDFLAGS "${HWLOC_DARWIN_LDFLAGS} -framework IOKit")
+            add_definitions(-DHWLOC_HAVE_DARWIN_IOKIT=1)
+        else()
+            message(CHECK_PASS No)
+        endif ()
+        set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_BAK})
+
+        message("**** end of Darwin-specific checks")
+    endif ()
+
+    if (HWLOC_LINUX_SYS)
+        message("")
+        message("**** Linux-specific checks")
+
+        check_function_exists(sched_getcpu HAVE_DECL_SCHED_GETCPU)
+
+        hwloc_check_decl(sched_setaffinity HWLOC_HAVE_SCHED_SETAFFINITY)
+        if (HWLOC_HAVE_SCHED_SETAFFINITY AND HWLOC_STRICT_ARGS_CFLAGS STREQUAL "FAIL")
+            message(WARNING "Support for sched_setaffinity() requires a C compiler which considers incorrect argument counts to be a fatal error.")
+            message(FATAL_ERROR "Cannot continue.")
+        endif ()
+
+        if (HWLOC_HAVE_SCHED_SETAFFINITY)
+            message(CHECK_START "Checking for old prototype of sched_setaffinity")
+
+            set(CMAKE_REQUIRED_FLAGS_BAK ${CMAKE_REQUIRED_FLAGS})
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS} ${HWLOC_STRICT_ARGS_CFLAGS}")
+
+            check_c_source_compiles(
+                    "
+                      #ifndef _GNU_SOURCE
+                      # define _GNU_SOURCE
+                      #endif
+                      #include <sched.h>
+                      static unsigned long mask;
+
+                      int main() {
+                        sched_setaffinity(0, (void*) &mask);
+                        return 0;
+                      }
+                    "
+                    HWLOC_HAVE_OLD_SCHED_SETAFFINITY
+            )
+
+            if (HWLOC_HAVE_OLD_SCHED_SETAFFINITY)
+                message(CHECK_PASS Yes)
+            else ()
+                message(CHECK_PASS No)
+            endif ()
+
+            set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_BAK})
+
+            message(CHECK_START "Checking for working CPU_SET")
+
+            check_c_source_compiles(
+                    "
+                    #ifndef _GNU_SOURCE
+                    # define _GNU_SOURCE
+                    #endif
+                    #include <sched.h>
+                    cpu_set_t set;
+
+                    int main() {
+                        CPU_ZERO(&set); CPU_SET(0, &set);
+                        return 0;
+                    }
+                    "
+                    HWLOC_HAVE_CPU_SET
+            )
+
+            if (HWLOC_HAVE_CPU_SET)
+                message(CHECK_PASS Yes)
+            else ()
+                message(CHECK_PASS No)
+            endif ()
+
+            message(CHECK_START "Checking for working CPU_SET_S")
+
+            check_c_source_compiles(
+                    "
+                    #ifndef _GNU_SOURCE
+                    # define _GNU_SOURCE
+                    #endif
+                    #include <sched.h>
+                    cpu_set_t *set;
+
+                    int main() {
+                        set = CPU_ALLOC(1024);
+                        CPU_ZERO_S(CPU_ALLOC_SIZE(1024), set);
+                        CPU_SET_S(CPU_ALLOC_SIZE(1024), 0, set);
+                        CPU_FREE(set);
+                        return 0;
+                    }
+                    "
+                    HWLOC_HAVE_CPU_SET_S
+            )
+
+            if (HWLOC_HAVE_CPU_SET_S)
+                message(CHECK_PASS Yes)
+            else ()
+                message(CHECK_PASS No)
+            endif ()
+
+            message(CHECK_START "Checking for working syscall with 6 parameters")
+
+            check_c_source_compiles(
+                    "
+                    #ifndef _GNU_SOURCE
+                    # define _GNU_SOURCE
+                    #endif
+                    #include <unistd.h>
+                    #include <sys/syscall.h>
+
+                    int main() {
+                        syscall(0, 1, 2, 3, 4, 5, 6);
+                        return 0;
+                    }
+                    "
+                    HWLOC_HAVE_SYSCALL
+            )
+
+            if (HWLOC_HAVE_SYSCALL)
+                message(CHECK_PASS Yes)
+            else ()
+                message(CHECK_PASS No)
+            endif ()
+
+            # Linux libudev support
+
+            if (NOT DISABLE_LIBUDEV)
+                check_include_file(libudev.h HAVE_LIBUDEV_H)
+
+                if (HAVE_LIBUDEV_H)
+                    find_library(HWLOC_HAVE_LIBUDEV udev)
+                    if (HWLOC_HAVE_LIBUDEV)
+                        set(HWLOC_LIBS "${HWLOC_LIBS} -ludev")
+                    endif ()
+                endif ()
+            endif ()
+        endif ()
+
+        message("**** end of Linux-specific checks")
+    endif ()
+
+    if (NOT HWLOC_LINUX_SYS)
+        check_include_file("sys/param.h" HAVE_SYS_PARAM_H)
+        check_include_file("sys/sysctl.h" HAVE_SYS_SYSCTL_H)
+
+        if (HAVE_SYS_SYSCTL_H)
+            set(HWLOC_SYS_TEST_HEADERS "sys/sysctl.h")
+            if (HAVE_SYS_PARAM_H)
+                set(HWLOC_SYS_TEST_HEADERS "$sys/param.h;{HWLOC_SYS_TEST_HEADERS}")
+            endif ()
+            check_symbol_exists(CTL_HW ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_CTL_HW)
+            check_symbol_exists(HW_NCPU ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_NCPU)
+            check_symbol_exists(HW_REALMEM64 ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_REALMEM64)
+            check_symbol_exists(HW_MEMSIZE64 ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_MEMSIZE64)
+            check_symbol_exists(HW_PHYSMEM64 ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_PHYSMEM64)
+            check_symbol_exists(HW_USERMEM64 ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_USERMEM64)
+            check_symbol_exists(HW_REALMEM ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_REALMEM)
+            check_symbol_exists(HW_MEMSIZE ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_MEMSIZE)
+            check_symbol_exists(HW_PHYSMEM ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_PHYSMEM)
+            check_symbol_exists(HW_USERMEM ${HWLOC_SYS_TEST_HEADERS} HAVE_DECL_HW_USERMEM)
+        endif ()
+
+        # Don't detect sysctl* on Linux because its sysctl() syscall is
+        # long deprecated and unneeded. Some libc still expose the symbol
+        # and raise a big warning at link time.
+
+        # Do a full link test instead of just using AC_CHECK_FUNCS, which
+        # just checks to see if the symbol exists or not.  For example,
+        # the prototype of sysctl uses u_int, which on some platforms
+        # (such as FreeBSD) is only defined under __BSD_VISIBLE, __USE_BSD
+        # or other similar definitions.  So while the symbols "sysctl" and
+        # "sysctlbyname" might still be available in libc (which autoconf
+        # checks for), they might not be actually usable.
+
+        message(CHECK_START "Checking for sysctl")
+
+        check_c_source_compiles(
+                "
+                  #include <stdio.h>
+                  #include <sys/types.h>
+                  #include <sys/sysctl.h>
+
+                  int main() {
+                      syscall(0, 1, 2, 3, 4, 5, 6);
+                      return 0;
+                  }
+                "
+                HAVE_SYSCTL
+        )
+
+        if (HAVE_SYSCTL)
+            message(CHECK_PASS Yes)
+        else ()
+            message(CHECK_PASS No)
+        endif ()
+
+        message(CHECK_START "Checking for sysctlbyname")
+
+        check_c_source_compiles(
+                "
+                  #include <stdio.h>
+                  #include <sys/types.h>
+                  #include <sys/sysctl.h>
+
+                  int main() {
+                      return sysctlbyname(NULL,NULL,NULL,NULL,0);
+                  }
+                "
+                HAVE_SYSCTLBYNAME
+        )
+
+        if (HAVE_SYSCTLBYNAME)
+            message(CHECK_PASS Yes)
+        else ()
+            message(CHECK_PASS No)
+        endif ()
+    endif ()
+
+    #set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+    set(HWLOC_PTHREAD_TEST_HEADERS "pthread.h")
+    if (HAVE_PTHREAD_NP_H)
+        set(HWLOC_PTHREAD_TEST_HEADERS "${HWLOC_PTHREAD_TEST_HEADERS};pthread_np.h")
+    endif ()
+    check_symbol_exists(pthread_setaffinity_np ${HWLOC_PTHREAD_TEST_HEADERS} HAVE_DECL_PTHREAD_SETAFFINITY_NP)
+    check_symbol_exists(pthread_getaffinity_np ${HWLOC_PTHREAD_TEST_HEADERS} HAVE_DECL_PTHREAD_GETAFFINITY_NP)
+
+    check_symbol_exists("fabsf" "math.h" HAVE_DECL_FABSF)
+    if (HAVE_DECL_FABSF)
+        find_library(HAVE_LIBM m)
+        if (HAVE_LIBM)
+            set(NEED_LIBM 1 CACHE INTERNAL "")
+        endif ()
+    endif ()
+
 
     # Note that private/config.h *MUST* be listed first so that it
     # becomes the "main" config header file.  Any AC-CONFIG-HEADERS
