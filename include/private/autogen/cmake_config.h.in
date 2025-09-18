@@ -377,6 +377,88 @@
    */
 #cmakedefine HAVE_DECL_FABSF
 
+/* Define to 1 if you have the declaration of `_SC_LARGE_PAGESIZE', and to 0
+   if you don't. */
+#cmakedefine HAVE_DECL__SC_LARGE_PAGESIZE
+
+/* Define to 1 if you have the declaration of `_SC_NPROCESSORS_ONLN', and to 0
+   if you don't. */
+#cmakedefine HAVE_DECL__SC_NPROCESSORS_ONLN
+
+/* Define to 1 if you have the declaration of `_SC_NPROCESSORS_CONF', and to 0
+   if you don't. */
+#cmakedefine HAVE_DECL__SC_NPROCESSORS_CONF
+
+/* Define to 1 if you have the declaration of `_SC_NPROC_CONF', and to 0 if
+   you don't. */
+#cmakedefine HAVE_DECL__SC_NPROC_CONF
+
+/* Define to 1 if you have the declaration of `_SC_NPROC_ONLN', and to 0 if
+   you don't. */
+#cmakedefine HAVE_DECL__SC_NPROC_ONLN
+
+/* Define to 1 if you have the declaration of `_SC_PAGESIZE', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL__SC_PAGESIZE
+
+/* Define to 1 if you have the declaration of `_SC_PAGE_SIZE', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL__SC_PAGE_SIZE
+
+/* Define to 1 if you have the <mach_init.h> header file. */
+#cmakedefine HAVE_MACH_INIT_H
+
+/* Define to 1 if you have the <mach/mach_host.h> header file. */
+#cmakedefine HAVE_MACH_MACH_HOST_H
+
+/* Define to 1 if you have the <mach/mach_init.h> header file. */
+#cmakedefine HAVE_MACH_MACH_INIT_H
+
+/* Define to 1 if you have the `host_info' function. */
+#cmakedefine HAVE_HOST_INFO
+
+/* Define to 1 if you have the `strtoull' function. */
+#cmakedefine HAVE_STRTOULL
+
+/* Define to 1 if the system has the type `ssize_t'. */
+#cmakedefine HAVE_SSIZE_T
+
+/* Define to 1 if you have the declaration of `snprintf', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_SNPRINTF
+
+/* Define to 1 if you have the declaration of `_strdup', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL__STRDUP
+
+/* Define to 1 if you have the declaration of `_putenv', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL__PUTENV
+
+/* Define to 1 if snprintf supports NULL output buffer and returns the correct
+   length on truncation */
+#cmakedefine HWLOC_HAVE_CORRECT_SNPRINTF
+
+/* Define to 1 if you have the declaration of `getprogname', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_GETPROGNAME
+
+/* Define to 1 if you have the declaration of `getexecname', and to 0 if you
+   don't. */
+#cmakedefine HAVE_DECL_GETEXECNAME
+
+/* Define to '1' if program_invocation_name is present and usable */
+#cmakedefine HAVE_PROGRAM_INVOCATION_NAME
+
+/* Define to '1' if __progname is present and usable */
+#cmakedefine HAVE___PROGNAME
+
+/* Define this to the process ID type */
+#cmakedefine hwloc_pid_t @hwloc_pid_t@
+
+/* Define this to the thread ID type */
+#cmakedefine hwloc_thread_t @hwloc_thread_t@
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #cmakedefine HAVE_DLFCN_H
 

@@ -32,6 +32,7 @@ function(hwloc_setup_core prefix mode)
     include(CheckFunctionExists)
     include(CheckTypeSize)
     include(CheckSymbolExists)
+    include(CheckSourceRuns)
 
     # Print configuration message if provided
     if(ARGV3)
@@ -166,7 +167,7 @@ function(hwloc_setup_core prefix mode)
         add_definitions(HWLOC_DEBUG)
     endif()
 
-    message(STATUS "${HWLOC_DEBUG_MSG}")
+    message(STATUS "Want hwloc maintainer support: ${HWLOC_DEBUG_MSG}")
 
     # We need to set a path for header, etc files depending on whether
     # we're standalone or embedded. this is taken care of by HWLOC_EMBEDDED.
@@ -189,7 +190,7 @@ function(hwloc_setup_core prefix mode)
 
     string(TOUPPER "${HWLOC_SYMBOL_PREFIX_VALUE}" HWLOC_SYMBOL_PREFIX_CAPS)
     add_definitions(-DHWLOC_SYM_PREFIX_CAPS=${HWLOC_SYMBOL_PREFIX_CAPS})
-    message(STATUS ${HWLOC_SYMBOL_PREFIX_VALUE})
+    message(STATUS "hwloc symbol prefix ${HWLOC_SYMBOL_PREFIX_VALUE}")
 
     # Give an easy #define to know if we need to transform all the
     # hwloc names
@@ -470,7 +471,7 @@ function(hwloc_setup_core prefix mode)
     check_include_file("dirent.h" HAVE_DIRENT_H)
     check_include_file("strings.h" HAVE_STRINGS_H)
     check_include_file("ctype.h" HAVE_CTYPE_H)
-    check_include_file("sys/wait.h" HAVE_CTYPE_H)
+    check_include_file("sys/wait.h" HAVE_SYS_WAIT_H)
 
     hwloc_check_decl(strcasecmp HWLOC_HAVE_DECL_STRCASECMP)
     hwloc_check_decl(strncasecmp HWLOC_HAVE_DECL_STRNCASECMP)
@@ -650,6 +651,9 @@ function(hwloc_setup_core prefix mode)
         message("")
         message("**** Linux-specific checks")
 
+        set(CMAKE_REQUIRED_DEFINITIONS "-D_GNU_SOURCE")
+        add_definitions(-D_GNU_SOURCE)
+
         check_function_exists(sched_getcpu HAVE_DECL_SCHED_GETCPU)
 
         hwloc_check_decl(sched_setaffinity HWLOC_HAVE_SCHED_SETAFFINITY)
@@ -775,6 +779,7 @@ function(hwloc_setup_core prefix mode)
                     endif ()
                 endif ()
             endif ()
+
         endif ()
 
         message("**** end of Linux-specific checks")
@@ -857,6 +862,7 @@ function(hwloc_setup_core prefix mode)
         endif ()
     endif ()
 
+
     #set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
     set(HWLOC_PTHREAD_TEST_HEADERS "pthread.h")
     if (HAVE_PTHREAD_NP_H)
@@ -865,6 +871,9 @@ function(hwloc_setup_core prefix mode)
     check_symbol_exists(pthread_setaffinity_np ${HWLOC_PTHREAD_TEST_HEADERS} HAVE_DECL_PTHREAD_SETAFFINITY_NP)
     check_symbol_exists(pthread_getaffinity_np ${HWLOC_PTHREAD_TEST_HEADERS} HAVE_DECL_PTHREAD_GETAFFINITY_NP)
 
+
+    set(CMAKE_REQUIRED_LIBRARIES_BAK ${CMAKE_REQUIRED_LIBRARIES})
+    set(CMAKE_REQUIRED_LIBRARIES "m")
     check_symbol_exists("fabsf" "math.h" HAVE_DECL_FABSF)
     if (HAVE_DECL_FABSF)
         find_library(HAVE_LIBM m)
@@ -873,6 +882,134 @@ function(hwloc_setup_core prefix mode)
         endif ()
     endif ()
 
+    check_symbol_exists("modff" "math.h" HAVE_DECL_MODFF)
+    if (HAVE_DECL_MODFF)
+        find_library(HAVE_LIBM m)
+        if (HAVE_LIBM)
+            set(NEED_LIBM 1 CACHE INTERNAL "")
+        endif ()
+    endif ()
+
+    set(CMAKE_REQUIRED_LIBRARIES_BAK ${CMAKE_REQUIRED_LIBRARIES_BAK})
+
+    if (NEED_LIBM)
+        set(HWLOC_LIBS "-lm ${HWLOC_LIBS}")
+    endif()
+
+    check_symbol_exists("_SC_NPROCESSORS_ONLN" "unistd.h" HAVE_DECL__SC_NPROCESSORS_ONLN)
+    check_symbol_exists("_SC_NPROCESSORS_CONF" "unistd.h" HAVE_DECL__SC_NPROCESSORS_CONF)
+    check_symbol_exists("_SC_NPROC_ONLN" "unistd.h" HAVE_DECL__SC_NPROC_ONLN)
+    check_symbol_exists("_SC_NPROC_CONF" "unistd.h" HAVE_DECL__SC_NPROC_CONF)
+    check_symbol_exists("_SC_PAGESIZE" "unistd.h" HAVE_DECL__SC_PAGESIZE)
+    check_symbol_exists("_SC_PAGE_SIZE" "unistd.h" HAVE_DECL__SC_PAGE_SIZE)
+    check_symbol_exists("_SC_LARGE_PAGESIZE" "unistd.h" HAVE_DECL__SC_LARGE_PAGESIZE)
+
+    check_include_file("mach/mach_init.h" HAVE_MACH_MACH_INIT_H)
+    check_include_file("mach_init.h" HAVE_MACH_INIT_H)
+    check_include_file("mach/mach_host.h" HAVE_MACH_MACH_HOST_H)
+
+    if (HAVE_MACH_MACH_HOST_H)
+        check_include_file("host_info" HAVE_HOST_INFO)
+    endif ()
+
+    check_symbol_exists("strtoull" "stdlib.h" HAVE_STRTOULL)
+
+    # Needed for Windows in private/misc.h1
+    check_type_size("ssize_t" HAVE_SSIZE_T)
+    check_symbol_exists("snprintf" "stdio.h" HAVE_DECL_SNPRINTF)
+    check_symbol_exists("snprintf" "stdio.h" HAVE_DECL_SNPRINTF)
+    # strdup and putenv are declared in windows headers but marked deprecated
+    check_symbol_exists("_strdup" "string.h" HAVE_DECL__STRDUP)
+    check_symbol_exists("_putenv" "stdlib.h" HAVE_DECL__PUTENV)
+    # Could add mkdir and access for hwloc-gather-cpuid.c on Windows
+
+    message(CHECK_START "Checking whether snprintf is correct")
+
+    check_source_runs(C "
+        #include <stdio.h>
+        #include <string.h>
+        #include <assert.h>
+
+        int main() {
+            char buf[7];
+            assert(snprintf(buf, 7, \"abcdef\") == 6);
+            assert(snprintf(buf, 6, \"abcdef\") == 6);
+            assert(snprintf(buf, 5, \"abcdef\") == 6);
+            assert(snprintf(buf, 0, \"abcdef\") == 6);
+            assert(snprintf(NULL, 0, \"abcdef\") == 6);
+            return 0;
+        }
+    " HAS_WORKING_SNPRINTF)
+
+    if(HAS_WORKING_SNPRINTF)
+        message(CHECK_PASS "snprintf works correctly")
+        set(HWLOC_HAVE_CORRECT_SNPRINTF 1 CACHE INTERNAL "")
+    else()
+        message(CHECK_FAIL "snprintf does not work correctly, setting broken_snprintf to true")
+    endif()
+
+    check_symbol_exists("getprogname" "stdlib.h" HAVE_DECL_GETPROGNAME)
+    check_symbol_exists("getexecname" "stdlib.h" HAVE_DECL_GETEXECNAME)
+    # program_invocation_name and __progname may be available but not exported in headers
+
+    message(CHECK_START "Checking for program_invocation_name")
+
+    check_c_source_compiles("
+        #ifndef _GNU_SOURCE
+        # define _GNU_SOURCE
+        #endif
+        #include <errno.h>
+        #include <stdio.h>
+
+        extern char *program_invocation_name;
+
+        int main() {
+            return printf(\"%s\", program_invocation_name);
+        }
+    " HAVE_PROGRAM_INVOCATION_NAME)
+
+    if (HAVE_PROGRAM_INVOCATION_NAME)
+        message(CHECK_PASS "Yes")
+    else ()
+        message(CHECK_FAIL "No")
+    endif ()
+
+
+    message(CHECK_START "Checking for __progname")
+
+    check_c_source_compiles("
+        #include <stdio.h>
+        extern char *__progname;
+
+        int main() {
+            return printf(\"%s\", __progname);
+        }
+    " HAVE___PROGNAME)
+
+    if (HAVE___PROGNAME)
+        message(CHECK_PASS "Yes")
+    else ()
+        message(CHECK_FAIL "No")
+    endif ()
+
+    if(MINGW OR CYGWIN)
+        set(hwloc_pid_t "HANDLE" CACHE INTERNAL "")
+        set(hwloc_thread_t "HANDLE" CACHE INTERNAL "")
+    else()
+        set(hwloc_pid_t "pid_t" CACHE INTERNAL "")
+
+        check_type_size("pthread_t" hwloc_thread_t_ok)
+
+        if(hwloc_thread_t_ok)
+            set(hwloc_thread_t "pthread_t" CACHE INTERNAL "")
+        endif()
+    endif()
+
+    add_definitions(-Dhwloc_pid_t=${hwloc_pid_t})
+
+    if(NOT hwloc_thread_t STREQUAL "")
+        add_definitions(-Dhwloc_thread_t=${hwloc_thread_t})
+    endif()
 
     # Note that private/config.h *MUST* be listed first so that it
     # becomes the "main" config header file.  Any AC-CONFIG-HEADERS
