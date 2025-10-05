@@ -3,49 +3,65 @@ function(hwloc_check_visibility)
     # versions of gcc, icc, Sun Studio cc.
     include(CheckCSourceCompiles)
 
-    option(ENABLE_VISIBILITY "Enable visibility feature of certain compilers/linkers" ON)
+    option(ENABLE_VISIBILITY "enable visibility feature of certain compilers/linkers (default: enabled on platforms that support it)" ON)
 
     if (CMAKE_SYSTEM_NAME MATCHES "AIX" OR CMAKE_SYSTEM_NAME MATCHES "MSYS" OR CMAKE_SYSTEM_NAME MATCHES "MINGW" OR CMAKE_SYSTEM_NAME MATCHES "CYGWIN" OR CMAKE_SYSTEM_NAME MATCHES "HP-UX")
         set(ENABLE_VISIBILITY NO)
     endif ()
 
+    set(hwloc_visibility_define 0)
+    set(hwloc_msg "whether to enable symbol visibility")
+
     if (NOT ENABLE_VISIBILITY)
-        message(STATUS "Symbol visibility: no (disabled)")
+        message(CHECK_START ${hwloc_msg})
+        message(CHECK_FAIL "no (disabled)")
     else ()
 
-        set(HWLOC_WARNING_FLAGS)
+        set(CMAKE_REQUIRED_FLAGS_BAK ${CMAKE_REQUIRED_FLAGS})
+
+        set(hwloc_add "")
         if (CMAKE_C_COMPILER_ID STREQUAL "SunPro")
             # Check using Sun Studio -xldscope=hidden flag
-            set(HWLOC_VISIBILITY_TEST_FLAGS "-xldscope=hidden")
-            set(HWLOC_WARNING_FLAGS "-errwarn=%all")
+            set(hwloc_add "-xldscope=hidden")
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${hwloc_add} -errwarn=%all")
         else ()
             # Check using -fvisibility=hidden
-            set(HWLOC_VISIBILITY_TEST_FLAGS "-fvisibility=hidden")
-            set(HWLOC_WARNING_FLAGS "-Werror")
+            set(hwloc_add "-fvisibility=hidden")
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${hwloc_add} -Werror")
         endif ()
 
-        set(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS} ${HWLOC_VISIBILITY_TEST_FLAGS} ${HWLOC_WARNING_FLAGS}")
+        message(CHECK_START "Checking if ${CMAKE_C_COMPILER_ID} supports ${hwloc_add}")
         check_c_source_compiles("
-                #include <stdio.h>
-                __attribute__((visibility(\"default\"))) int foo;
-                int main(){
-                    fprintf(stderr, \"Hello, world\");
-                    return 0;
-                }
-                "
-                HWLOC_HAVE_VISIBILITY
-        )
+            #include <stdio.h>
+            __attribute__((visibility(\"default\"))) int foo;
 
-        if (HWLOC_HAVE_VISIBILITY)
-            set(HWLOC_VISIBILITY_CFLAGS ${HWLOC_VISIBILITY_TEST_FLAGS} CACHE INTERNAL "")
-            set(HWLOC_C_HAVE_VISIBILITY ${HWLOC_HAVE_VISIBILITY} CACHE INTERNAL "")
-        elseif (ENABLE_VISIBILITY)
-            message(FATAL_ERROR "Symbol visibility support requested but compiler does not seem to support it.  Aborting")
-        else()
-            message("Visibility is not supported")
+            int main(){
+                fprintf(stderr, \"Hello, world\n\");
+                return 0;
+            }" COMPILES FAIL_REGEX "visibility")
+
+        if (COMPILES)
+            message(CHECK_PASS "yes")
+        else ()
+            message(CHECK_PASS "no")
         endif ()
 
-        add_definitions(-DHWLOC_C_HAVE_VISIBILITY=${HWLOC_HAVE_VISIBILITY})
+        set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_BAK})
 
+        set(HWLOC_VISIBILITY_CFLAGS ${hwloc_add} CACHE INTERNAL "")
+
+        if (NOT hwloc_add STREQUAL "")
+            set (hwloc_visibility_define 1)
+            message(CHECK_START "Checking ${hwloc_msg}")
+            message(CHECK_PASS "yes (via ${hwloc_add})")
+        elseif(ENABLE_VISIBILITY STREQUAL ON)
+            message(FATAL_ERROR "Symbol visibility support requested but compiler does not seem to support it.  Aborting")
+        else ()
+            message(CHECK_START "Checking ${hwloc_msg}")
+            message(CHECK_PASS "no (unsupported)")
+        endif ()
+
+        set(HWLOC_C_HAVE_VISIBILITY ${hwloc_visibility_define} CACHE BOOL "Whether C compiler supports symbol visibility or not")
+        add_definitions(-DHWLOC_C_HAVE_VISIBILITY=${hwloc_visibility_define})
     endif ()
 endfunction()

@@ -7,6 +7,8 @@ include(cmake/hwloc.cmake)
 include(cmake/hwloc_check_attributes.cmake)
 include(cmake/hwloc_check_vendor.cmake)
 include(cmake/hwloc_check_visibility.cmake)
+include(cmake/hwloc_pkg.cmake)
+include(cmake/hwloc_components.cmake)
 
 enable_testing()
 
@@ -23,12 +25,11 @@ if (NOT ${ENABLE_EMBEDDED_MODE})
         message(WARNING "Try using the --enable-embedded-mode switch.")
         message(FATAL_ERROR "Cannot build standalone hwloc")
     else ()
-        set(HWLOC_BUILD_STANDALONE ON)
-        set(HWLOC_MODE standalone)
+        hwloc_build_standalone()
     endif ()
 endif ()
 
-hwloc_setup_core("" "")
+hwloc_setup_core("" "" "")
 
 project(hwloc
         LANGUAGES C

@@ -17,17 +17,17 @@
 #cmakedefine HWLOC_CONFIGURE_H
 
 /* Whether we are in debugging mode or not */
-#cmakedefine HWLOC_DEBUG @HWLOC_DEBUG@
+#cmakedefine HWLOC_DEBUG
 
 /* Define to 1 on Linux */
-#cmakedefine HWLOC_LINUX_SYS @HWLOC_LINUX_SYS@
+#cmakedefine HWLOC_LINUX_SYS
 
 /* Define to 1 for I/O discovery in the Linux component */
-#cmakedefine HWLOC_HAVE_LINUXIO @HWLOC_HAVE_LINUXIO@
+#cmakedefine HWLOC_HAVE_LINUXIO
 
 /* Define to 1 if enabling Linux-specific PCI discovery in the Linux I/O
    component */
-#cmakedefine HWLOC_HAVE_LINUXPCI @HWLOC_HAVE_LINUXPCI@
+#cmakedefine HWLOC_HAVE_LINUXPCI
 
 /* Whether we need to re-define all the hwloc public symbols or not */
 #cmakedefine01 HWLOC_SYM_TRANSFORM
@@ -459,8 +459,80 @@
 /* Define this to the thread ID type */
 #cmakedefine hwloc_thread_t @hwloc_thread_t@
 
+/* Define to 1 if function `ffs' is declared by system headers */
+#cmakedefine HWLOC_HAVE_DECL_FFS
+
+/* Define to 1 if function `ffsl' is declared by system headers */
+#cmakedefine HWLOC_HAVE_DECL_FFSL
+
+/* Define to 1 if you have the `ffs' function. */
+#cmakedefine HWLOC_HAVE_FFS
+
+/* Define to 1 if you have the `ffsl' function. */
+#cmakedefine HWLOC_HAVE_FFSL
+
+/* Define to 1 if your `ffs' function is known to be broken. */
+#cmakedefine HWLOC_HAVE_BROKEN_FFS
+
+/* Define to 1 if function `fls' is declared by system headers */
+#cmakedefine HWLOC_HAVE_DECL_FLS
+
+/* Define to 1 if function `flsl' is declared by system headers */
+#cmakedefine HWLOC_HAVE_DECL_FLSL
+
+/* Define to 1 if you have the `fls' function. */
+#cmakedefine HWLOC_HAVE_FLS
+
+/* Define to 1 if you have the `flsl' function. */
+#cmakedefine HWLOC_HAVE_FLSL
+
+/* Define to 1 if you have the `clz' function. */
+#cmakedefine HWLOC_HAVE_CLZ
+
+/* Define to 1 if you have the `clzl' function. */
+#cmakedefine HWLOC_HAVE_CLZL
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#cmakedefine HAVE_MALLOC_H
+
+/* Define to 1 if you have the `getpagesize' function. */
+#cmakedefine HAVE_GETPAGESIZE
+
+/* Define to 1 if you have the `memalign' function. */
+#cmakedefine HAVE_MEMALIGN
+
+/* Define to 1 if you have the `posix_memalign' function. */
+#cmakedefine HAVE_POSIX_MEMALIGN
+
+/* Define to 1 if you have the <sys/utsname.h> header file. */
+#cmakedefine HAVE_SYS_UTSNAME_H
+
+/* Define to 1 if you have the `uname' function. */
+#cmakedefine HAVE_UNAME
+
+/* Define to 1 if pthread mutexes are available */
+#cmakedefine HWLOC_HAVE_PTHREAD_MUTEX
+
+/* Define to 1 if you have the <valgrind/valgrind.h> header file. */
+#cmakedefine HAVE_VALGRIND_VALGRIND_H
+
+/* Embedded mode; just assume we do not have Valgrind support */
+#cmakedefine HAVE_DECL_RUNNING_ON_VALGRIND
+
+/* Define to 1 if you have the `libxml2' library. */
+#cmakedefine HWLOC_HAVE_LIBXML2
+
+/* Define to 1 if you have x86 cpuid */
+#cmakedefine HWLOC_HAVE_X86_CPUID
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #cmakedefine HAVE_DLFCN_H
+
+/* Define to 1 if the hwloc library should use ltdl for loading plugins */
+#cmakedefine HWLOC_HAVE_LTDL
+
+/* Define to 1 if the hwloc library should support dynamically-loaded plugins */
+#cmakedefine HWLOC_HAVE_PLUGINS
 
 /* Are we building for HP-UX? */
 #cmakedefine01 _HPUX_SOURCE
