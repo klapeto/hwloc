@@ -36,9 +36,9 @@ function(hwloc_check_visibility)
             __attribute__((visibility(\"default\"))) int foo;
 
             int main(){
-                fprintf(stderr, \"Hello, world\n\");
+                fprintf(stderr, \"Hello, world\");
                 return 0;
-            }" COMPILES FAIL_REGEX "visibility")
+            }" COMPILES FAIL_REGEX "[Ww]arn.+visibility")
 
         if (COMPILES)
             message(CHECK_PASS "yes")

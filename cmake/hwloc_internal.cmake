@@ -19,7 +19,7 @@ function(hwloc_define_args)
     option(ENABLE_CPUID "Disable the cpuid-based architecture specific support (x86 component)" ON)
     option(ENABLE_LIBXML2 "Do not use libxml2 for XML support, use a custom minimalistic support" ON)
 
-    option(ENABLE_IO "Disable I/O discovery build entirely (PCI, LinuxIO, CUDA, OpenCL, NVML, RSMI, LevelZero, GL) instead of only disabling it at runtime by default" OFF)
+    option(ENABLE_IO "Disable I/O discovery build entirely (PCI, LinuxIO, CUDA, OpenCL, NVML, RSMI, LevelZero, GL) instead of only disabling it at runtime by default" ON)
     option(ENABLE_PCI "Disable the PCI device discovery build (instead of only disabling PCI at runtime by default)" ON)
     option(ENABLE_OPENCL "Disable the OpenCL device discovery build (instead of only disabling OpenCL at runtime by default)" ON)
     option(ENABLE_CUDA "Disable the CUDA device discovery build using libcudart (instead of only disabling CUDA at runtime by default)" ON)
@@ -37,7 +37,7 @@ function(hwloc_define_args)
     option(ENABLE_GL "Disable the GL display device discovery (instead of only disabling GL at runtime by default)" ON)
     option(ENABLE_LIBUDEV "Disable the Linux libudev" ON)
 
-    option(ENABLE_PLUGINS "Build the given components as dynamically-loaded plugins" ON)
+    set(ENABLE_PLUGINS "-1" CACHE STRING "Build the given components as dynamically-loaded plugins")
 
     set(HWLOC_PLUGINS_PATH "$<TARGET_FILE_DIR:hwloc>" CACHE PATH "Colon-separated list of plugin directories. Default: '$<TARGET_FILE_DIR:hwloc>'. Plugins will be installed in the first directory. They will be loaded from all of them, in order.")
 

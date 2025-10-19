@@ -537,6 +537,34 @@
 /* Are we building for HP-UX? */
 #cmakedefine01 _HPUX_SOURCE
 
+/* Define to 1 if you have the declaration of `modff', and to 0 if you don't.
+   */
+#cmakedefine HAVE_DECL_MODFF
+
+/* Define if the PCI component is built statically inside libhwloc */
+#cmakedefine HWLOC_PCI_COMPONENT_BUILTIN
+
+/* Define if the OpenCL component is built statically inside libhwloc */
+#cmakedefine HWLOC_OPENCL_COMPONENT_BUILTIN
+
+/* Define if the CUDA component is built statically inside libhwloc */
+#cmakedefine HWLOC_CUDA_COMPONENT_BUILTIN
+
+/* Define if the NVML component is built statically inside libhwloc */
+#cmakedefine HWLOC_NVML_COMPONENT_BUILTIN
+
+/* Define if the RSMI component is built statically inside libhwloc */
+#cmakedefine HWLOC_RSMI_COMPONENT_BUILTIN
+
+/* Define if the LevelZero component is built statically inside libhwloc */
+#cmakedefine HWLOC_LEVELZERO_COMPONENT_BUILTIN
+
+/* Define if the GL component is built statically inside libhwloc */
+#cmakedefine HWLOC_GL_COMPONENT_BUILTIN
+
+/* Define if the libxml XML component is built statically inside libhwloc */
+#cmakedefine HWLOC_XML_LIBXML_COMPONENT_BUILTIN
+
 /* Enable extensions on HP-UX. */
 #ifndef _HPUX_SOURCE
 #cmakedefine _HPUX_SOURCE
