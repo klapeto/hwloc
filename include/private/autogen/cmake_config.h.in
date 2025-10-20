@@ -565,6 +565,51 @@
 /* Define if the libxml XML component is built statically inside libhwloc */
 #cmakedefine HWLOC_XML_LIBXML_COMPONENT_BUILTIN
 
+/* Define to 1 if you have the <X11/keysym.h> header file. */
+#cmakedefine HAVE_X11_KEYSYM_H
+
+/* Define to 1 if you have the <X11/Xlib.h> header file. */
+#cmakedefine HAVE_X11_XLIB_H
+
+/* Define to 1 if you have the <X11/Xutil.h> header file. */
+#cmakedefine HAVE_X11_XUTIL_H
+
+/* Define to 1 if you have the <xlocale.h> header file. */
+#cmakedefine HAVE_XLOCALE_H
+
+/* Define to 1 if X11 headers including Xutil.h and keysym.h are available. */
+#cmakedefine HWLOC_HAVE_X11_KEYSYM
+
+/* Define to 1 if you have the `cairo' library. */
+#cmakedefine HWLOC_HAVE_CAIRO
+
+/* Define if lstopo Cairo/X11 interactive graphical output is supported */
+#cmakedefine LSTOPO_HAVE_X11
+
+/* Define to 1 if the system has the type `wchar_t'. */
+#cmakedefine HAVE_WCHAR_T
+
+/* Define to 1 if you have the `putwc' function. */
+#cmakedefine HAVE_PUTWC
+
+/* Define to 1 if you have the <xlocale.h> header file. */
+#cmakedefine HAVE_XLOCALE_H
+
+/* Define to 1 if you have the <locale.h> header file. */
+#cmakedefine HAVE_LOCALE_H
+
+/* Define to 1 if you have the `setlocale' function. */
+#cmakedefine HAVE_SETLOCALE
+
+/* Define to 1 if you have the `uselocale' function. */
+#cmakedefine HAVE_USELOCALE
+
+/* Define to 1 if you have the <langinfo.h> header file. */
+#cmakedefine HAVE_LANGINFO_H
+
+/* Define to 1 if you have the `nl_langinfo' function. */
+#cmakedefine HAVE_NL_LANGINFO
+
 /* Enable extensions on HP-UX. */
 #ifndef _HPUX_SOURCE
 #cmakedefine _HPUX_SOURCE

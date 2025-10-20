@@ -44,3 +44,122 @@ function(hwloc_define_args)
     option(ENABLE_PLUGIN_DLOPEN "Do not use dlopen for loading plugins." ON)
     option(ENABLE_PLUGIN_LTDL "Do not use ltdl for loading plugins." OFF)
 endfunction()
+
+# Probably only ever invoked by hwloc's configure.ac
+function(hwloc_setup_utils)
+    include(CheckTypeSize)
+    include(CheckSymbolExists)
+
+    message("")
+    message("###")
+    message("### Configuring hwloc command line utilities")
+    message("###")
+
+    find_program(HAVE_SED sed)
+
+    include(GNUInstallDirs)
+
+    set(HWLOC_runstatedir ${RUNSTATEDIR} CACHE INTERNAL "")
+
+    # X11 support
+    find_package(X11)
+
+    if (X11_FOUND)
+        check_include_file("X11/Xlib.h" HAVE_X11_XLIB_H)
+        if (HAVE_X11_XLIB_H)
+            check_include_file("X11/Xutil.h" HAVE_X11_XUTIL_H)
+            if (HAVE_X11_XUTIL_H)
+                check_include_file("X11/keysym.h" HAVE_X11_KEYSYM_H)
+                set(HWLOC_HAVE_X11_KEYSYM 1 CACHE BOOL "Define to 1 if X11 headers including Xutil.h and keysym.h are available.")
+                set(hwloc_x11_keysym_happy "yes")
+                set(HWLOC_X11_CPPFLAGS "-I\"${X11_X11_INCLUDE_PATH}\"")
+                set(HWLOC_X11_CPPFLAGS "${HWLOC_X11_CPPFLAGS}" CACHE STRING "")
+                set(HWLOC_X11_LIBS "-l\"${X11_xcb_keysyms_LIB}\" -lx11")
+                set(HWLOC_X11_LIBS "${HWLOC_X11_LIBS}")
+            endif ()
+        endif ()
+    endif ()
+
+    # Cairo support
+    set(hwloc_cairo_happy "no")
+    if (ENABLE_CAIRO STREQUAL ON)
+        hwloc_pkg_check_modules(CAIRO cairo cairo_fill "cairo.h")
+        if (HAVE_CAIRO)
+            set(hwloc_cairo_happy "yes")
+        else ()
+            set(hwloc_cairo_happy "no")
+        endif ()
+    endif ()
+
+    if (hwloc_cairo_happy STREQUAL "yes")
+        set(HWLOC_HAVE_CAIRO 1 CACHE BOOL "Define to 1 if you have the `cairo' library.")
+        message(CHECK_START "Checking whether lstopo Cairo/X11 interactive graphical output is supported")
+
+        if (hwloc_x11_keysym_happy STREQUAL "yes")
+            set(CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} ${HWLOC_CAIRO_CFLAGS} ${HWLOC_X11_CPPFLAGS}")
+
+            set(CMAKE_REQUIRED_LIBS_SAVE ${CMAKE_REQUIRED_LIBS})
+            set(CMAKE_REQUIRED_LIBS "${CMAKE_REQUIRED_LIBS} ${HWLOC_CAIRO_LIBS} ${HWLOC_X11_LIBS}")
+
+            check_c_source_compiles("
+                #include <cairo.h>
+                #ifndef CAIRO_HAS_XLIB_SURFACE
+                #error
+                #endif
+                int main(){return 0;}
+            " LSTOPO_HAVE_X11)
+
+            if (LSTOPO_HAVE_X11)
+                message(CHECK_PASS "yes")
+                set(lstopo_have_x11 "yes")
+                set(LSTOPO_HAVE_X11 1 CACHE BOOL "Define if lstopo Cairo/X11 interactive graphical output is supported")
+            else ()
+                message(CHECK_FAIL " (missing CAIRO_HAS_XLIB_SURFACE)")
+            endif ()
+
+            set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_SAVE}")
+            set(CMAKE_REQUIRED_LIBS "${CMAKE_REQUIRED_LIBS_SAVE}")
+        endif ()
+    else ()
+        if (ENABLE_CAIRO STREQUAL ON)
+            message(WARNING "--enable-cairo requested, but Cairo/X11 support was not found")
+            message(FATAL_ERROR "Cannot continue")
+        endif ()
+    endif ()
+
+    check_type_size(wchar_t HAVE_WCHAR_T)
+
+    if (HAVE_WCHAR_T)
+        check_symbol_exists("putwc" "wchar.h" HAVE_PUTWC)
+    endif ()
+
+    set(HWLOC_XML_LOCALIZED 1)
+    check_include_file("locale.h" HAVE_LOCALE_H)
+
+    if (HAVE_LOCALE_H)
+        set(local_header "locale.h")
+    endif ()
+
+    check_include_file("xlocale.h" HAVE_XLOCALE_H)
+
+    if (HAVE_XLOCALE_H)
+        set(local_header "xlocale.h")
+    endif ()
+
+    if (HAVE_LOCALE_H OR HAVE_XLOCALE_H)
+        check_symbol_exists("setlocale" ${local_header} HAVE_SETLOCALE)
+        check_symbol_exists("uselocale" ${local_header} HAVE_USELOCALE)
+        if (NOT HAVE_USELOCALE)
+            set(HWLOC_XML_LOCALIZED 0)
+        endif ()
+    endif ()
+
+    set(HWLOC_XML_LOCALIZED ${HWLOC_XML_LOCALIZED} CACHE BOOL "")
+
+    check_include_file("langinfo.h" HAVE_LANGINFO_H)
+    if (HAVE_LANGINFO_H)
+        check_symbol_exists("nl_langinfo" "langinfo.h" HAVE_NL_LANGINFO)
+    endif ()
+
+endfunction()
